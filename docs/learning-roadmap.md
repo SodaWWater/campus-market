@@ -1,20 +1,28 @@
 # 学习路线
 
-1. 跑通注册和登录，理解 BCrypt 与 JWT 返回值。
-2. 看 `SecurityConfig` 和 `JwtAuthenticationFilter`，理解哪些接口放行、哪些接口需要角色。
-3. 看 `sys_user`、`market_goods`、`market_order` 等表和 Entity 映射。
-4. 看 `GoodsServiceImpl`，理解 sellerId 为什么来自当前登录用户。
-5. 看 `CategoryServiceImpl`，理解 Redis 缓存查询、写入和删除。
-6. 看 `OrderServiceImpl`，理解创建订单事务和状态流转。
-7. 看 `OrderEventConsumer`，理解 RabbitMQ 如何做订单事件日志。
-8. 启动 `frontend`，按 `docs/api.md` 的顺序演示接口。
+## 推荐学习顺序
 
-## 7 天计划
+1. 跑通 Docker + 后端 + 前端，登录 admin 账号体验完整流程
+2. 看 `SecurityConfig` 和 `JwtAuthenticationFilter`，理解鉴权链路
+3. 看 `sys_user` → `market_goods` → `market_order` 核心表关系
+4. 看 `GoodsServiceImpl`，理解商品发布 → 审核 → 上架流程
+5. 看 `OrderServiceImpl`，理解条件 UPDATE 防并发 + 状态流转
+6. 看 `PaymentServiceImpl`，理解支付记录 + 日志的事务写入
+7. 看 `CategoryServiceImpl`，理解 Redis 缓存查询、写入、删除
+8. 看 `FavoriteServiceImpl`，理解收藏计数同步
+9. 看 `MessageServiceImpl`，理解会话列表 + 未读数查询
+10. 看 `ReviewServiceImpl`，理解评价业务约束
+11. 看 `AdminServiceImpl`，理解后台操作 + 操作日志记录
+12. 启动前端，体验用户端和后台端的路由和布局差异
 
-- Day 1：跑通后端、导入 SQL。
-- Day 2：理解登录注册和 JWT。
-- Day 3：理解 Spring Security 6 配置。
-- Day 4：理解商品和分类接口。
-- Day 5：理解 Redis 缓存降级。
-- Day 6：理解订单事务和 RabbitMQ 事件。
-- Day 7：用自己的话复述项目，并准备接口演示。
+## 7 天学习计划
+
+| 天 | 内容 | 关键文件 |
+|----|------|----------|
+| Day 1 | 跑通 Docker + 后端 + 前端，登录测试 | `docker-compose.yml`、`README.md` |
+| Day 2 | 理解认证鉴权：Spring Security 6 + JWT | `SecurityConfig.java`、`JwtAuthenticationFilter.java` |
+| Day 3 | 理解商品与审核：发布、审核、上架 | `GoodsController.java`、`GoodsServiceImpl.java` |
+| Day 4 | 理解订单与支付：创建、锁定、支付、取消 | `OrderServiceImpl.java`、`PaymentServiceImpl.java` |
+| Day 5 | 理解缓存与降级：Redis Cache-Aside | `CategoryServiceImpl.java` |
+| Day 6 | 理解用户互动：收藏、消息、评价、举报 | `FavoriteServiceImpl.java`、`MessageServiceImpl.java` |
+| Day 7 | 前端架构 + 用自己的话复述项目 | `frontend/src/router/`、`frontend/src/views/` |
