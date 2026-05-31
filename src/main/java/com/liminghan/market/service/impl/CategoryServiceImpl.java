@@ -82,9 +82,31 @@ public class CategoryServiceImpl extends ServiceImpl<MarketCategoryMapper, Marke
     }
 
     @Override
+    public MarketCategory enableCategory(Long id) {
+        return updateCategoryStatus(id, "ENABLE");
+    }
+
+    @Override
+    public MarketCategory disableCategory(Long id) {
+        return updateCategoryStatus(id, "DISABLED");
+    }
+
+    @Override
     public void deleteCategory(Long id) {
         removeById(id);
         evictCache();
+    }
+
+    private MarketCategory updateCategoryStatus(Long id, String status) {
+        MarketCategory category = getById(id);
+        if (category == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND, "category not found");
+        }
+        category.setStatus(status);
+        category.setUpdatedAt(LocalDateTime.now());
+        updateById(category);
+        evictCache();
+        return category;
     }
 
     private void evictCache() {

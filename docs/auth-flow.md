@@ -1,29 +1,25 @@
 # 登录认证流程
 
-当前阶段使用 Spring Security 6，不使用 `WebSecurityConfigurerAdapter`。
-
 ```mermaid
-flowchart LR
-    A["用户注册"] --> B["BCrypt 加密密码"]
-    C["用户登录"] --> D["校验用户名和密码"]
-    D --> E["JwtUtil 生成 token"]
-    F["请求业务接口"] --> G["Authorization: Bearer token"]
-    G --> H["JwtAuthenticationFilter"]
-    H --> I["解析 SecurityUser"]
-    I --> J["SecurityContext"]
-    J --> K["访问受保护接口"]
+sequenceDiagram
+  participant U as 用户
+  participant A as AuthController
+  participant S as AuthServiceImpl
+  participant DB as sys_user
+  participant J as JwtUtil
+  U->>A: POST /api/auth/login
+  A->>S: login
+  S->>DB: 按 username 查询用户
+  S->>S: PasswordEncoder.matches
+  S->>J: 生成 token
+  J-->>U: token, userId, username, role
+  U->>A: Authorization: Bearer token
 ```
 
-## 权限规则
+## 认证规则
 
-- `/api/health`、`/api/auth/register`、`/api/auth/login` 放行。
-- `/api/admin/**` 仅允许 `ADMIN` 角色访问。
-- 其他接口需要登录。
-
-## 关键类
-
-- `SecurityConfig`
-- `JwtUtil`
-- `JwtAuthenticationFilter`
-- `CustomUserDetailsService`
-- `SecurityUser`
+- `/api/auth/register`、`/api/auth/login`、`/api/health`、Swagger 路径放行。
+- 普通业务接口需要登录。
+- `/api/admin/**` 需要 `ADMIN` 角色。
+- 使用 Spring Security 6 的 `SecurityFilterChain`，没有使用 `WebSecurityConfigurerAdapter`。
+- 密码使用 BCrypt 保存，`sample-data.sql` 中也使用 BCrypt hash。

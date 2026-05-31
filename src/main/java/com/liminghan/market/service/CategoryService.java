@@ -14,5 +14,9 @@ public interface CategoryService extends IService<MarketCategory> {
 
     MarketCategory updateCategory(Long id, CategoryRequest request);
 
+    MarketCategory enableCategory(Long id);
+
+    MarketCategory disableCategory(Long id);
+
     void deleteCategory(Long id);
 }

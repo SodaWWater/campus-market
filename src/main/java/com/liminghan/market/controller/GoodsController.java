@@ -5,6 +5,7 @@ import com.liminghan.market.common.Result;
 import com.liminghan.market.dto.GoodsCreateRequest;
 import com.liminghan.market.dto.GoodsUpdateRequest;
 import com.liminghan.market.entity.MarketGoods;
+import com.liminghan.market.service.FavoriteService;
 import com.liminghan.market.service.GoodsService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -23,9 +24,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class GoodsController {
 
     private final GoodsService goodsService;
+    private final FavoriteService favoriteService;
 
-    public GoodsController(GoodsService goodsService) {
+    public GoodsController(GoodsService goodsService, FavoriteService favoriteService) {
         this.goodsService = goodsService;
+        this.favoriteService = favoriteService;
     }
 
     @Operation(summary = "Create goods")
@@ -76,5 +79,19 @@ public class GoodsController {
     @PutMapping("/{id}/off")
     public Result<MarketGoods> off(@PathVariable Long id) {
         return Result.success(goodsService.offShelfMyGoods(id));
+    }
+
+    @Operation(summary = "Favorite goods")
+    @PostMapping("/{id}/favorite")
+    public Result<String> favorite(@PathVariable Long id) {
+        favoriteService.favorite(id);
+        return Result.success("ok");
+    }
+
+    @Operation(summary = "Unfavorite goods")
+    @DeleteMapping("/{id}/favorite")
+    public Result<String> unfavorite(@PathVariable Long id) {
+        favoriteService.unfavorite(id);
+        return Result.success("ok");
     }
 }

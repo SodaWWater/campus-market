@@ -1,193 +1,195 @@
-# 面试问答
+# campus-market-admin 面试问答
+
+每题按“考点、回答、不要、代码位置”准备。
 
 ## 项目介绍类
 
-1. 这个项目是做什么的？
-   - 面试官想考什么：项目定位。
-   - 推荐回答：这是校园二手交易后端项目，包含注册登录、商品、分类、订单、后台管理。
-   - 不要怎么回答：不要说是完整电商平台。
-   - 对应代码位置：`AuthController`、`GoodsController`、`OrderController`
+### 1. 这个项目是什么？
+- 面试官想考什么：项目定位。
+- 推荐回答：这是个人学习、复现与二次开发项目，做校园二手交易和后台管理，包含登录、JWT、商品、分类、订单、后台接口、Redis 缓存和 RabbitMQ 订单事件。
+- 不要怎么回答：不要说成公司真实业务系统。
+- 对应代码位置：`README.md`。
 
-2. 项目适合投什么岗位？
-   - 面试官想考什么：技术栈匹配。
-   - 推荐回答：适合 Java 后端实习，因为覆盖 Spring Boot、MyBatis-Plus、MySQL、Redis、JWT、事务。
-   - 不要怎么回答：不要说覆盖所有后端技术。
-   - 对应代码位置：`README.md`
+### 2. 核心业务链路是什么？
+- 面试官想考什么：业务理解。
+- 推荐回答：用户登录后发布商品，其他用户创建订单，订单创建锁定商品，支付后商品售出，取消未支付订单恢复上架。
+- 不要怎么回答：不要只说增删改查。
+- 对应代码位置：`OrderServiceImpl.java`。
 
-3. 项目核心链路是什么？
-   - 面试官想考什么：业务理解。
-   - 推荐回答：用户登录拿 token，发布商品，买家创建订单，订单状态和商品状态同步变化。
-   - 不要怎么回答：不要只说增删改查。
-   - 对应代码位置：`AuthServiceImpl`、`GoodsServiceImpl`、`OrderServiceImpl`
+### 3. 前端做了什么？
+- 面试官想考什么：演示能力。
+- 推荐回答：Vue 3 前端支持登录注册、JWT 保存、商品发布查询、分类缓存查看、订单操作和 ADMIN 后台入口。
+- 不要怎么回答：不要说做了复杂管理系统。
+- 对应代码位置：`frontend/src/App.vue`。
 
-4. 你做了哪些模块？
-   - 面试官想考什么：个人工作范围。
-   - 推荐回答：认证、商品、分类、订单、后台管理、SQL 和文档。
-   - 不要怎么回答：不要说自己做了复杂前端或真实支付。
-   - 对应代码位置：`controller`、`service.impl`
+### 4. 表结构有哪些？
+- 面试官想考什么：数据库设计。
+- 推荐回答：用户、分类、商品、订单、订单事件日志五张表，字段下划线，Java 驼峰映射。
+- 不要怎么回答：不要漏掉事件日志表。
+- 对应代码位置：`scripts/init.sql`，`entity` 包。
 
-5. 这个项目没有做什么？
-   - 面试官想考什么：边界意识。
-   - 推荐回答：没有做真实支付、复杂 RBAC、微服务和复杂前端。
-   - 不要怎么回答：不要把未实现功能写进简历。
-   - 对应代码位置：`README.md`
+### 5. 后台管理实现了什么？
+- 面试官想考什么：权限和管理边界。
+- 推荐回答：ADMIN 可查用户、商品、订单，并可下架商品；没有做复杂 RBAC。
+- 不要怎么回答：不要说有菜单权限或权限表。
+- 对应代码位置：`AdminController.java`，`AdminServiceImpl.java`。
 
 ## Spring Boot 类
 
-6. 项目如何分层？
-   - 面试官想考什么：工程结构。
-   - 推荐回答：Controller 接口层，Service 业务层，Mapper 数据访问层，Entity 映射表，DTO/VO 区分请求响应。
-   - 不要怎么回答：不要把业务堆在 Controller。
-   - 对应代码位置：`controller`、`service`、`mapper`
+### 6. Controller 和 Service 怎么分层？
+- 面试官想考什么：代码结构。
+- 推荐回答：Controller 接收请求和返回 Result，Service 处理业务校验、事务、缓存和消息发送，Mapper 负责数据库。
+- 不要怎么回答：不要把业务写在 Controller。
+- 对应代码位置：`controller`，`service/impl`。
 
-7. 统一返回怎么做？
-   - 面试官想考什么：接口规范。
-   - 推荐回答：所有接口返回 `Result<T>`，包含 code、message、data。
-   - 不要怎么回答：不要每个接口返回不同结构。
-   - 对应代码位置：`Result`
+### 7. 统一返回怎么做？
+- 面试官想考什么：接口规范。
+- 推荐回答：使用 `Result<T>` 包装 code、message、data，异常由 `GlobalExceptionHandler` 统一处理。
+- 不要怎么回答：不要每个接口返回不同结构。
+- 对应代码位置：`common/Result.java`，`GlobalExceptionHandler.java`。
 
-8. 异常如何处理？
-   - 面试官想考什么：工程实践。
-   - 推荐回答：业务异常用 `BusinessException`，统一由 `GlobalExceptionHandler` 返回。
-   - 不要怎么回答：不要直接抛原始异常给前端。
-   - 对应代码位置：`GlobalExceptionHandler`
+### 8. 参数校验怎么做？
+- 面试官想考什么：基础质量。
+- 推荐回答：DTO 上使用 validation 注解，Controller 使用 `@Valid` 触发校验。
+- 不要怎么回答：不要完全依赖前端校验。
+- 对应代码位置：`dto` 包。
 
-9. OpenAPI 有什么用？
-   - 面试官想考什么：接口调试。
-   - 推荐回答：通过 springdoc-openapi 生成 Swagger 页面，便于查看和测试接口。
-   - 不要怎么回答：不要说只靠口头说明接口。
-   - 对应代码位置：`OpenApiConfig`
+### 9. 为什么使用 MyBatis-Plus？
+- 面试官想考什么：技术选型。
+- 推荐回答：减少基础 CRUD 样板代码，同时保留 Wrapper 条件查询，适合这个学习项目。
+- 不要怎么回答：不要说 MyBatis-Plus 能自动解决所有复杂 SQL。
+- 对应代码位置：`mapper` 包，`service/impl`。
 
-10. 为什么使用 Maven release 17？
-    - 面试官想考什么：Java 版本意识。
-    - 推荐回答：交易项目面向常见 Java 后端实习场景，用 release 17 更容易匹配多数 Spring Boot 3 项目环境。
-    - 不要怎么回答：不要说版本随便写。
-    - 对应代码位置：`pom.xml`
+### 10. Swagger 有什么用？
+- 面试官想考什么：接口调试。
+- 推荐回答：通过 SpringDoc 提供 Swagger UI，方便本地查看和测试接口。
+- 不要怎么回答：不要把 Swagger 当鉴权方案。
+- 对应代码位置：`OpenApiConfig.java`。
 
 ## MyBatis / MySQL 类
 
-11. 数据库有哪些核心表？
-    - 面试官想考什么：数据建模。
-    - 推荐回答：`sys_user`、`market_category`、`market_goods`、`market_order`。
-    - 不要怎么回答：不要只说用户表和商品表。
-    - 对应代码位置：`scripts/init.sql`
+### 11. 商品分页怎么实现？
+- 面试官想考什么：分页查询。
+- 推荐回答：使用 MyBatis-Plus `Page` 和 QueryWrapper，支持关键词模糊查询、分类筛选。
+- 不要怎么回答：不要把所有数据查出后内存分页。
+- 对应代码位置：`GoodsServiceImpl#pageGoods`。
 
-12. MyBatis-Plus 用在哪里？
-    - 面试官想考什么：ORM 使用。
-    - 推荐回答：每张表都有 Entity、Mapper、Service，使用 BaseMapper 和 IService 完成常见操作。
-    - 不要怎么回答：不要说所有 SQL 都手写。
-    - 对应代码位置：`entity`、`mapper`、`service`
+### 12. sellerId 从哪里来？
+- 面试官想考什么：安全意识。
+- 推荐回答：发布商品时 sellerId 从 SecurityContext 当前登录用户获取，不允许前端传 sellerId。
+- 不要怎么回答：不要相信前端传入的卖家 id。
+- 对应代码位置：`GoodsServiceImpl#createGoods`，`SecurityContextUtil.java`。
 
-13. 字段命名如何映射？
-    - 面试官想考什么：映射细节。
-    - 推荐回答：SQL 用下划线，Java 用驼峰，配置 `map-underscore-to-camel-case`。
-    - 不要怎么回答：不要说字段名不需要对应。
-    - 对应代码位置：`application.yml`
+### 13. 订单创建为什么要事务？
+- 面试官想考什么：一致性。
+- 推荐回答：创建订单和修改商品状态必须一起成功或失败，避免订单创建了但商品没锁定。
+- 不要怎么回答：不要忽略半成功问题。
+- 对应代码位置：`OrderServiceImpl#createOrder`。
 
-14. 商品分页怎么实现？
-    - 面试官想考什么：分页查询。
-    - 推荐回答：使用 MyBatis-Plus `Page`，支持关键词 `like` 和分类 `eq` 条件。
-    - 不要怎么回答：不要一次查全量再内存分页。
-    - 对应代码位置：`GoodsServiceImpl`
+### 14. 商品状态有哪些？
+- 面试官想考什么：状态建模。
+- 推荐回答：`ON_SALE`、`LOCKED`、`SOLD`、`OFF_SHELF`。
+- 不要怎么回答：不要只用布尔字段表示复杂状态。
+- 对应代码位置：`entity/MarketGoods.java`，`GoodsStatus`。
 
-15. 为什么不用 `user` 表名？
-    - 面试官想考什么：SQL 基础。
-    - 推荐回答：`user` 容易和数据库关键字或系统表混淆，所以使用 `sys_user`。
-    - 不要怎么回答：不要忽略表名兼容性。
-    - 对应代码位置：`scripts/init.sql`
+### 15. 订单状态有哪些？
+- 面试官想考什么：业务流转。
+- 推荐回答：`CREATED`、`PAID`、`CANCELED`、`FINISHED`。
+- 不要怎么回答：不要混淆商品状态和订单状态。
+- 对应代码位置：`entity/MarketOrder.java`，`OrderStatus`。
 
 ## Redis 类
 
-16. Redis 用在哪里？
-    - 面试官想考什么：缓存场景。
-    - 推荐回答：缓存分类列表，key 为 `market:category:list`。
-    - 不要怎么回答：不要说所有数据都放 Redis。
-    - 对应代码位置：`CategoryServiceImpl`
+### 16. 分类缓存怎么做？
+- 面试官想考什么：缓存基本流程。
+- 推荐回答：先查 Redis 的 `market:category:list`，没有再查 MySQL，查完写回；新增、修改、删除后删除缓存。
+- 不要怎么回答：不要更新数据库后忘记删缓存。
+- 对应代码位置：`CategoryServiceImpl.java`。
 
-17. 分类缓存流程是什么？
-    - 面试官想考什么：缓存读写。
-    - 推荐回答：先查 Redis，未命中查 MySQL，查到后写 Redis。
-    - 不要怎么回答：不要说每次都查数据库。
-    - 对应代码位置：`CategoryServiceImpl`
+### 17. Redis 不可用怎么办？
+- 面试官想考什么：降级能力。
+- 推荐回答：捕获 Redis 异常后直接查 MySQL 或继续主流程，Redis 只作为优化。
+- 不要怎么回答：不要让缓存故障导致业务不可用。
+- 对应代码位置：`CategoryServiceImpl.java`，`GoodsServiceImpl.java`。
 
-18. 分类变更后怎么处理缓存？
-    - 面试官想考什么：缓存一致性。
-    - 推荐回答：新增、修改、删除分类后删除 `market:category:list`。
-    - 不要怎么回答：不要让旧缓存一直存在。
-    - 对应代码位置：`CategoryServiceImpl`
+### 18. 热商品缓存是什么？
+- 面试官想考什么：缓存场景选择。
+- 推荐回答：缓存第一页未筛选商品，key 是 `market:goods:hot`，商品变化后删除。
+- 不要怎么回答：不要缓存所有分页组合。
+- 对应代码位置：`GoodsServiceImpl#pageGoods`。
 
-19. Redis 不可用怎么办？
-    - 面试官想考什么：降级意识。
-    - 推荐回答：Redis 操作用 try-catch 包住，不可用时直接查 MySQL，不影响主流程。
-    - 不要怎么回答：不要让缓存失败导致接口不可用。
-    - 对应代码位置：`CategoryServiceImpl`
+### 19. 为什么用删除缓存？
+- 面试官想考什么：一致性策略。
+- 推荐回答：对本项目来说删除缓存简单可靠，下次查询再回源 MySQL，降低更新缓存写错的风险。
+- 不要怎么回答：不要说缓存永远一致。
+- 对应代码位置：`CategoryServiceImpl`，`AdminServiceImpl`。
 
-20. 为什么分类适合缓存？
-    - 面试官想考什么：缓存选择。
-    - 推荐回答：分类读多写少，数据量小，适合缓存。
-    - 不要怎么回答：不要说所有表都适合缓存。
-    - 对应代码位置：`redis-usage.md`
+### 20. Redis TTL 怎么配置？
+- 面试官想考什么：配置化。
+- 推荐回答：分类和热商品 TTL 放在 `application.yml` 的 `app.cache` 下。
+- 不要怎么回答：不要把 TTL 写死到多个地方。
+- 对应代码位置：`application.yml`。
 
 ## JWT / Spring Security 类
 
-21. Spring Security 6 怎么配置？
-    - 面试官想考什么：新版本配置方式。
-    - 推荐回答：使用 `SecurityFilterChain`，配置放行路径、ADMIN 路径和其他接口登录要求。
-    - 不要怎么回答：不要提 `WebSecurityConfigurerAdapter`。
-    - 对应代码位置：`SecurityConfig`
+### 21. Spring Security 6 怎么配置？
+- 面试官想考什么：版本用法。
+- 推荐回答：使用 `SecurityFilterChain` Bean 配置放行、鉴权和角色，不使用 `WebSecurityConfigurerAdapter`。
+- 不要怎么回答：不要写旧版配置类。
+- 对应代码位置：`SecurityConfig.java`。
 
-22. JWT Filter 做了什么？
-    - 面试官想考什么：鉴权流程。
-    - 推荐回答：读取 Authorization Header，解析 Bearer token，有效时写入 SecurityContext。
-    - 不要怎么回答：不要说每次都查 session。
-    - 对应代码位置：`JwtAuthenticationFilter`
+### 22. JWT Filter 做什么？
+- 面试官想考什么：认证链路。
+- 推荐回答：继承 `OncePerRequestFilter`，解析 Bearer token，有效时加载用户并写入 SecurityContext。
+- 不要怎么回答：不要在每个 Controller 里手动解析 token。
+- 对应代码位置：`JwtAuthenticationFilter.java`。
 
-23. 密码如何保存？
-    - 面试官想考什么：安全基础。
-    - 推荐回答：注册时使用 BCrypt hash，登录时用 `PasswordEncoder.matches` 校验。
-    - 不要怎么回答：不要明文保存密码。
-    - 对应代码位置：`AuthServiceImpl`
+### 23. 密码怎么保存？
+- 面试官想考什么：密码安全。
+- 推荐回答：注册时使用 BCrypt 加密，登录时用 `PasswordEncoder.matches` 校验，样例 SQL 也存 BCrypt hash。
+- 不要怎么回答：不要明文保存密码。
+- 对应代码位置：`AuthServiceImpl.java`，`scripts/sample-data.sql`。
 
-24. ADMIN 接口如何限制？
-    - 面试官想考什么：权限控制。
-    - 推荐回答：`/api/admin/**` 在 SecurityConfig 中配置 `hasRole("ADMIN")`。
-    - 不要怎么回答：不要依赖前端隐藏按钮。
-    - 对应代码位置：`SecurityConfig`
+### 24. ADMIN 接口如何限制？
+- 面试官想考什么：权限控制。
+- 推荐回答：`/api/admin/**` 在 `SecurityConfig` 中要求 ADMIN，普通 USER 无法访问。
+- 不要怎么回答：不要只靠前端隐藏菜单。
+- 对应代码位置：`SecurityConfig.java`。
 
-25. token 中包含什么？
-    - 面试官想考什么：登录态设计。
-    - 推荐回答：包含 userId、username、role、exp，并使用 HMAC-SHA256 签名。
-    - 不要怎么回答：不要把密码放 token 里。
-    - 对应代码位置：`JwtUtil`
+### 25. SecurityUser 有什么作用？
+- 面试官想考什么：UserDetails 理解。
+- 推荐回答：封装用户 id、用户名、密码、角色，提供给 Spring Security 做认证和授权。
+- 不要怎么回答：不要直接把 Entity 暴露给安全框架。
+- 对应代码位置：`SecurityUser.java`。
 
 ## 订单 / 事务 / 业务设计类
 
-26. 创建订单校验什么？
-    - 面试官想考什么：业务规则。
-    - 推荐回答：校验商品存在、状态为 `ON_SALE`，且不能购买自己的商品。
-    - 不要怎么回答：不要直接插入订单。
-    - 对应代码位置：`OrderServiceImpl`
+### 26. 创建订单有哪些校验？
+- 面试官想考什么：业务规则。
+- 推荐回答：校验商品存在、状态为 `ON_SALE`，并禁止购买自己的商品。
+- 不要怎么回答：不要只插入订单。
+- 对应代码位置：`OrderServiceImpl#createOrder`。
 
-27. 创建订单后商品状态怎么变？
-    - 面试官想考什么：状态联动。
-    - 推荐回答：订单创建后商品状态从 `ON_SALE` 改为 `LOCKED`。
-    - 不要怎么回答：不要让商品继续被别人买。
-    - 对应代码位置：`OrderServiceImpl`
+### 27. 支付后发生什么？
+- 面试官想考什么：状态流转。
+- 推荐回答：订单改为 `PAID`，商品改为 `SOLD`，并发送订单事件。
+- 不要怎么回答：不要接真实支付，本项目只是状态模拟。
+- 对应代码位置：`OrderServiceImpl#payOrder`。
 
-28. 支付后发生什么？
-    - 面试官想考什么：状态流转。
-    - 推荐回答：订单从 `CREATED` 改为 `PAID`，商品从 `LOCKED` 改为 `SOLD`。
-    - 不要怎么回答：不要说接入了真实支付。
-    - 对应代码位置：`OrderServiceImpl`
+### 28. 取消订单怎么处理？
+- 面试官想考什么：回滚业务状态。
+- 推荐回答：未支付订单取消后，订单改为 `CANCELED`，商品恢复 `ON_SALE`。
+- 不要怎么回答：不要取消后仍锁定商品。
+- 对应代码位置：`OrderServiceImpl#cancelOrder`。
 
-29. 取消订单如何处理？
-    - 面试官想考什么：异常流程。
-    - 推荐回答：只有未支付订单可取消，取消后商品恢复 `ON_SALE`。
-    - 不要怎么回答：不要允许任意状态取消。
-    - 对应代码位置：`OrderServiceImpl`
+### 29. RabbitMQ 在订单里做什么？
+- 面试官想考什么：异步解耦。
+- 推荐回答：订单状态变化后发送事件，消费者保存到 `market_order_event_log`，主流程发送失败时记录异常但不影响订单状态。
+- 不要怎么回答：不要说 RabbitMQ 参与事务扣款。
+- 对应代码位置：`OrderServiceImpl.java`，`OrderEventConsumer.java`。
 
-30. 为什么订单操作要事务？
-    - 面试官想考什么：一致性。
-    - 推荐回答：订单和商品状态要一起修改，事务保证失败时一起回滚。
-    - 不要怎么回答：不要说事务只是注解装饰。
-    - 对应代码位置：`OrderServiceImpl`
+### 30. CI 做了什么？
+- 面试官想考什么：基础工程化。
+- 推荐回答：GitHub Actions 分别跑 Maven compile 和前端 npm build，作为提交后的基础验证。
+- 不要怎么回答：不要说实现了完整发布系统。
+- 对应代码位置：`.github/workflows/ci.yml`。

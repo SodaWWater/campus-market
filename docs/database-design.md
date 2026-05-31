@@ -1,18 +1,20 @@
 # 数据库设计
 
-数据库名：`campus_market`
+数据库：`campus_market`。SQL 字段使用下划线，Java Entity 使用驼峰，MyBatis-Plus 开启 `map-underscore-to-camel-case`。
 
-字段命名约定：
+| 表名 | 说明 | 主要字段 |
+| --- | --- | --- |
+| `sys_user` | 用户 | `id`, `username`, `password`, `nickname`, `phone`, `role`, `created_at`, `updated_at` |
+| `market_category` | 分类 | `id`, `name`, `sort`, `status`, `created_at`, `updated_at` |
+| `market_goods` | 商品 | `id`, `seller_id`, `category_id`, `title`, `description`, `price`, `status`, `view_count`, `created_at`, `updated_at` |
+| `market_order` | 订单 | `id`, `order_no`, `buyer_id`, `seller_id`, `goods_id`, `amount`, `status`, `created_at`, `updated_at` |
+| `market_order_event_log` | 订单事件日志 | `id`, `order_id`, `goods_id`, `buyer_id`, `event_type`, `status`, `created_at` |
 
-- SQL 字段使用下划线命名。
-- Java 实体字段使用驼峰命名。
-- MyBatis-Plus 使用 `map-underscore-to-camel-case: true` 映射。
+商品状态：`ON_SALE`、`LOCKED`、`SOLD`、`OFF_SHELF`。
 
-## 表结构
+订单状态：`CREATED`、`PAID`、`CANCELED`、`FINISHED`。
 
-- `sys_user`：用户表，角色只保留 `USER`、`ADMIN`
-- `market_category`：商品分类表
-- `market_goods`：商品表，状态为 `ON_SALE`、`LOCKED`、`SOLD`、`OFF_SHELF`
-- `market_order`：订单表，状态为 `CREATED`、`PAID`、`CANCELED`、`FINISHED`
+初始化脚本：
 
-完整建表语句见 `scripts/init.sql`，演示数据见 `scripts/sample-data.sql`。
+- `scripts/init.sql`
+- `scripts/sample-data.sql`

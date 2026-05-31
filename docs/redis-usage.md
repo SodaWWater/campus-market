@@ -1,15 +1,17 @@
 # Redis 使用说明
 
-当前阶段 Redis 用于缓存商品分类列表。
-
-## 分类缓存
+## 分类列表缓存
 
 - key：`market:category:list`
-- 查询分类列表时先读 Redis
-- Redis 无数据时查询 MySQL
-- 查询结果写入 Redis，过期时间 1 小时
-- 新增、修改、删除分类后删除缓存
+- 写入位置：`CategoryServiceImpl#listCategories`
+- 删除位置：新增、修改、删除分类后删除缓存
+- 降级：Redis 异常时直接查 MySQL，不影响接口主流程
 
-## 降级策略
+## 热商品页缓存
 
-Redis 不可用时，分类查询会直接走 MySQL，不影响主流程。
+- key：`market:goods:hot`
+- 写入位置：`GoodsServiceImpl#pageGoods`
+- 缓存条件：第一页、无关键词、无分类筛选、size 不超过 10
+- 删除位置：发布、修改、删除、管理员下架商品后删除缓存
+
+Redis 在本项目中只作为性能优化，不作为核心数据来源。

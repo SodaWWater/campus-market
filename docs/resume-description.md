@@ -1,39 +1,20 @@
 # 简历描述
 
-## 简历项目标题
+## 校园二手交易与后台管理系统
 
-校园二手交易与后台管理系统
+技术栈：Spring Boot 3、Java 17、Spring Security 6、JWT、MyBatis-Plus、MySQL、Redis、RabbitMQ、Vue 3、Element Plus。
 
-## 技术栈
+项目描述：个人学习、复现与二次开发项目，面向校园二手交易场景，实现注册登录、JWT 鉴权、商品发布与查询、分类缓存、订单状态流转、后台管理，并使用 RabbitMQ 记录订单事件日志，提供 Vue 3 前端演示。
 
-Java 17、Spring Boot 3、Spring Security 6、JWT、MyBatis-Plus、MySQL、Redis、springdoc-openapi
+主要工作：
 
-## 项目描述
+- 设计 `sys_user`、`market_category`、`market_goods`、`market_order`、`market_order_event_log` 表。
+- 使用 Spring Security 6 配置 `SecurityFilterChain` 和 JWT 过滤器。
+- 注册使用 BCrypt 加密密码，登录返回 token、userId、username、role。
+- 发布商品时 sellerId 从当前登录用户获取。
+- 分类列表和热商品页使用 Redis 缓存，缓存失败时降级查 MySQL。
+- 创建订单使用事务，保证订单和商品状态同步修改。
+- 使用 RabbitMQ 发送订单事件并落库为事件日志。
+- 使用 Vue 3 + Pinia 做登录、商品、分类、订单和后台入口。
 
-基于 Spring Boot 实现的校园二手交易后端项目，支持注册登录、JWT 鉴权、商品发布与分页查询、分类 Redis 缓存、订单创建与状态流转、后台用户和商品管理。项目使用 MyBatis-Plus 操作 MySQL，并通过事务保证订单和商品状态一致。
-
-## 主要工作
-
-1. 设计用户、分类、商品、订单四张核心表。
-2. 使用 Spring Security 6 和 JWT 实现登录鉴权。
-3. 注册时使用 BCrypt 加密密码，登录成功返回 token 和用户信息。
-4. 实现商品发布、修改、删除、分页查询和详情查询。
-5. 实现分类列表 Redis 缓存和缓存删除策略。
-6. 实现订单创建、支付、取消、完成流程，并使用事务维护状态一致。
-
-## 项目亮点
-
-1. 使用 `SecurityFilterChain` 和 JWT 实现清晰的认证流程。
-2. 分类缓存支持 Redis 降级，不影响主流程。
-3. 订单流程能体现事务、状态机和业务校验。
-
-## 1 分钟介绍话术
-
-这是一个校园二手交易后端项目。我用 Spring Boot 和 MyBatis-Plus 实现用户、商品、分类和订单模块，用 Spring Security 6 + JWT 做登录鉴权。用户登录后才能发布商品和创建订单，管理员接口只允许 ADMIN 访问。分类列表使用 Redis 缓存，分类变更后删除缓存。订单创建、支付、取消会同步维护商品状态，并用事务保证订单和商品状态一致。
-
-## 简历中应该避免夸大的内容
-
-- 不写真实支付。
-- 不写复杂权限系统。
-- 不写微服务架构。
-- 不写大规模并发场景。
+不要夸大：不要写精通、高并发、分布式、微服务、真实支付。

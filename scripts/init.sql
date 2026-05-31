@@ -147,3 +147,67 @@ CREATE TABLE IF NOT EXISTS goods_audit_log (
     INDEX idx_audit_goods (goods_id),
     INDEX idx_audit_admin (admin_id)
 );
+
+CREATE TABLE IF NOT EXISTS market_favorite (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id BIGINT NOT NULL,
+    goods_id BIGINT NOT NULL,
+    created_at DATETIME NOT NULL,
+    UNIQUE INDEX uk_user_goods (user_id, goods_id),
+    INDEX idx_favorite_user (user_id)
+);
+
+CREATE TABLE IF NOT EXISTS market_message (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    sender_id BIGINT NOT NULL,
+    receiver_id BIGINT NOT NULL,
+    goods_id BIGINT,
+    order_id BIGINT,
+    content VARCHAR(1000) NOT NULL,
+    read_status VARCHAR(20) NOT NULL DEFAULT 'UNREAD',
+    created_at DATETIME NOT NULL,
+    INDEX idx_message_sender (sender_id),
+    INDEX idx_message_receiver (receiver_id),
+    INDEX idx_message_goods (goods_id)
+);
+
+CREATE TABLE IF NOT EXISTS market_review (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    order_id BIGINT NOT NULL UNIQUE,
+    reviewer_id BIGINT NOT NULL,
+    target_user_id BIGINT NOT NULL,
+    goods_id BIGINT NOT NULL,
+    rating INT NOT NULL,
+    content VARCHAR(500),
+    created_at DATETIME NOT NULL,
+    INDEX idx_review_goods (goods_id),
+    INDEX idx_review_target_user (target_user_id)
+);
+
+CREATE TABLE IF NOT EXISTS market_report (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    reporter_id BIGINT NOT NULL,
+    target_type VARCHAR(32) NOT NULL,
+    target_id BIGINT NOT NULL,
+    reason VARCHAR(128) NOT NULL,
+    description VARCHAR(1000),
+    status VARCHAR(32) NOT NULL DEFAULT 'PENDING',
+    handler_id BIGINT,
+    handle_result VARCHAR(1000),
+    created_at DATETIME NOT NULL,
+    handled_at DATETIME,
+    INDEX idx_report_reporter (reporter_id),
+    INDEX idx_report_status (status)
+);
+
+CREATE TABLE IF NOT EXISTS admin_operation_log (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    admin_id BIGINT NOT NULL,
+    module VARCHAR(32) NOT NULL,
+    operation VARCHAR(64) NOT NULL,
+    target_id BIGINT,
+    content VARCHAR(500),
+    created_at DATETIME NOT NULL,
+    INDEX idx_admin_operation_admin (admin_id),
+    INDEX idx_admin_operation_module (module, target_id)
+);

@@ -13,3 +13,9 @@ logs/
 
 local/
 tmp/
+
+# Codex agent artifacts
+.codex/
+
+# Archives
+*.zip

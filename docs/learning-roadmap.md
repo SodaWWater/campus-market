@@ -1,29 +1,20 @@
 # 学习路线
 
-## 第 1 步：跑通项目
+1. 跑通注册和登录，理解 BCrypt 与 JWT 返回值。
+2. 看 `SecurityConfig` 和 `JwtAuthenticationFilter`，理解哪些接口放行、哪些接口需要角色。
+3. 看 `sys_user`、`market_goods`、`market_order` 等表和 Entity 映射。
+4. 看 `GoodsServiceImpl`，理解 sellerId 为什么来自当前登录用户。
+5. 看 `CategoryServiceImpl`，理解 Redis 缓存查询、写入和删除。
+6. 看 `OrderServiceImpl`，理解创建订单事务和状态流转。
+7. 看 `OrderEventConsumer`，理解 RabbitMQ 如何做订单事件日志。
+8. 启动 `frontend`，按 `docs/api.md` 的顺序演示接口。
 
-导入 `scripts/init.sql` 和 `scripts/sample-data.sql`，启动项目，访问 `GET /api/health`。
+## 7 天计划
 
-## 第 2 步：看认证模块
-
-阅读 `AuthController`、`AuthServiceImpl`、`JwtUtil`、`JwtAuthenticationFilter`、`SecurityConfig`。
-
-## 第 3 步：看商品模块
-
-阅读 `GoodsController` 和 `GoodsServiceImpl`，理解 sellerId 为什么来自当前登录用户。
-
-## 第 4 步：看分类缓存
-
-阅读 `CategoryController`、`AdminController` 和 `CategoryServiceImpl`，理解 Redis 缓存和删除缓存。
-
-## 第 5 步：看订单事务
-
-阅读 `OrderController` 和 `OrderServiceImpl`，理解创建、支付、取消、完成的状态流转。
-
-## 第 6 步：看后台管理
-
-阅读 `AdminController`、`AdminServiceImpl` 和 `SecurityConfig`，理解 ADMIN 接口如何限制。
-
-## 第 7 步：背面试题
-
-按 `docs/interview-qa.md` 的 30 个问题准备，每个问题都要能指出代码位置。
+- Day 1：跑通后端、导入 SQL。
+- Day 2：理解登录注册和 JWT。
+- Day 3：理解 Spring Security 6 配置。
+- Day 4：理解商品和分类接口。
+- Day 5：理解 Redis 缓存降级。
+- Day 6：理解订单事务和 RabbitMQ 事件。
+- Day 7：用自己的话复述项目，并准备接口演示。
