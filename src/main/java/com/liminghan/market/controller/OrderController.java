@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/order")
+@RequestMapping("/api/orders")
 public class OrderController {
 
     private final OrderService orderService;
@@ -32,22 +32,22 @@ public class OrderController {
         return Result.success(orderService.createOrder(request));
     }
 
-    @Operation(summary = "List my orders")
-    @GetMapping("/my")
-    public Result<List<MarketOrder>> myOrders() {
-        return Result.success(orderService.listMyOrders());
+    @Operation(summary = "List my buy orders")
+    @GetMapping("/my-buy")
+    public Result<List<MarketOrder>> myBuyOrders() {
+        return Result.success(orderService.listMyBuyOrders());
+    }
+
+    @Operation(summary = "List my sell orders")
+    @GetMapping("/my-sell")
+    public Result<List<MarketOrder>> mySellOrders() {
+        return Result.success(orderService.listMySellOrders());
     }
 
     @Operation(summary = "Get order detail")
     @GetMapping("/{id}")
     public Result<MarketOrder> get(@PathVariable Long id) {
         return Result.success(orderService.getOrder(id));
-    }
-
-    @Operation(summary = "Pay order")
-    @PutMapping("/{id}/pay")
-    public Result<MarketOrder> pay(@PathVariable Long id) {
-        return Result.success(orderService.payOrder(id));
     }
 
     @Operation(summary = "Cancel order")

@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>campus-market-platform V1</title>
+  <style>
+    body { margin: 0; font-family: Arial, "Microsoft YaHei", sans-serif; background: #f6f7fb; color: #1f2937; }
+    header { background: #1f2937; color: white; padding: 18px 28px; display: flex; justify-content: space-between; align-items: center; }
+    main { padding: 24px; display: grid; grid-template-columns: 360px 1fr; gap: 18px; }
+    section { background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 18px; }
+    h2 { margin: 0 0 12px; font-size: 18px; }
+    label { display: block; font-size: 13px; margin-top: 10px; color: #4b5563; }
+    input, textarea, select { width: 100%; box-sizing: border-box; margin-top: 4px; padding: 9px; border: 1px solid #d1d5db; border-radius: 6px; }
+    button { margin-top: 10px; padding: 9px 12px; border: 0; border-radius: 6px; background: #2563eb; color: white; cursor: pointer; }
+    button.secondary { background: #4b5563; }
+    button.danger { background: #dc2626; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+    .card { border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; background: #fff; }
+    .muted { color: #6b7280; font-size: 13px; }
+    pre { white-space: pre-wrap; background: #111827; color: #e5e7eb; padding: 12px; border-radius: 8px; max-height: 360px; overflow: auto; }
+  </style>
+</head>
+<body>
+<header>
+  <strong>campus-market-platform V1</strong>
+  <span id="userInfo">未登录</span>
+</header>
+<main>
+  <div>
+    <section>
+      <h2>登录</h2>
+      <label>用户名<input id="username" value="buyer1"></label>
+      <label>密码<input id="password" value="123456" type="password"></label>
+      <button onclick="login()">登录</button>
+      <button class="secondary" onclick="logout()">退出</button>
+    </section>
+
+    <section>
+      <h2>发布商品</h2>
+      <label>分类 ID<input id="categoryId" value="1"></label>
+      <label>标题<input id="title" value="二手教材"></label>
+      <label>价格<input id="price" value="30"></label>
+      <label>成色<select id="conditionLevel"><option>GOOD</option><option>LIKE_NEW</option><option>NORMAL</option></select></label>
+      <label>交易地点<input id="tradeLocation" value="图书馆门口"></label>
+      <label>描述<textarea id="description">课程用书，适合演示发布审核流程。</textarea></label>
+      <button onclick="createGoods()">发布待审核商品</button>
+    </section>
+
+    <section>
+      <h2>订单操作</h2>
+      <label>商品 ID<input id="orderGoodsId" value="1"></label>
+      <button onclick="createOrder()">创建订单</button>
+      <label>订单 ID<input id="orderId" value="1"></label>
+      <button onclick="payOrder()">模拟支付</button>
+      <button class="secondary" onclick="finishOrder()">确认完成</button>
+      <button class="danger" onclick="cancelOrder()">取消未支付订单</button>
+    </section>
+  </div>
+
+  <div>
+    <section>
+      <h2>商品广场</h2>
+      <button onclick="loadGoods()">刷新在售商品</button>
+      <div id="goodsList" class="grid"></div>
+    </section>
+    <section>
+      <h2>接口输出</h2>
+      <pre id="output">等待操作...</pre>
+    </section>
+  </div>
+</main>
+<script>
+  let token = localStorage.getItem('token') || '';
+  let currentUser = localStorage.getItem('currentUser') || '';
+  document.getElementById('userInfo').textContent = currentUser || '未登录';
+
+  async function request(path, options = {}) {
+    const headers = {'Content-Type': 'application/json', ...(options.headers || {})};
+    if (token) headers.Authorization = 'Bearer ' + token;
+    const response = await fetch(path, {...options, headers});
+    const data = await response.json();
+    document.getElementById('output').textContent = JSON.stringify(data, null, 2);
+    return data;
+  }
+
+  async function login() {
+    const data = await request('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({username: username.value, password: password.value})
+    });
+    if (data.code === 0) {
+      token = data.data.token;
+      currentUser = data.data.username + ' / ' + data.data.role;
+      localStorage.setItem('token', token);
+      localStorage.setItem('currentUser', currentUser);
+      userInfo.textContent = currentUser;
+    }
+  }
+
+  function logout() {
+    token = '';
+    currentUser = '';
+    localStorage.removeItem('token');
+    localStorage.removeItem('currentUser');
+    userInfo.textContent = '未登录';
+  }
+
+  async function loadGoods() {
+    const data = await request('/api/goods/page?current=1&size=20');
+    const records = data.data && data.data.records ? data.data.records : [];
+    goodsList.innerHTML = records.map(goods => `
+      <div class="card">
+        <strong>${goods.title}</strong>
+        <div class="muted">ID: ${goods.id} | ${goods.status}</div>
+        <div>￥${goods.price}</div>
+        <div class="muted">${goods.tradeLocation || ''}</div>
+        <button onclick="orderGoodsId.value='${goods.id}'">选择购买</button>
+      </div>
+    `).join('');
+  }
+
+  function createGoods() {
+    return request('/api/goods', {
+      method: 'POST',
+      body: JSON.stringify({
+        categoryId: Number(categoryId.value),
+        title: title.value,
+        description: description.value,
+        price: Number(price.value),
+        conditionLevel: conditionLevel.value,
+        tradeLocation: tradeLocation.value,
+        imageUrls: []
+      })
+    });
+  }
+
+  function createOrder() {
+    return request('/api/orders', {method: 'POST', body: JSON.stringify({goodsId: Number(orderGoodsId.value)})});
+  }
+
+  function payOrder() {
+    return request('/api/payments/mock-pay', {method: 'POST', body: JSON.stringify({orderId: Number(orderId.value)})});
+  }
+
+  function finishOrder() {
+    return request(`/api/orders/${orderId.value}/finish`, {method: 'PUT'});
+  }
+
+  function cancelOrder() {
+    return request(`/api/orders/${orderId.value}/cancel`, {method: 'PUT'});
+  }
+
+  loadGoods();
+</script>
+</body>
+</html>

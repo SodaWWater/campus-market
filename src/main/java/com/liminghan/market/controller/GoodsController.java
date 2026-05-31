@@ -40,25 +40,41 @@ public class GoodsController {
         return Result.success(goodsService.updateGoods(id, request));
     }
 
-    @Operation(summary = "Delete goods")
-    @DeleteMapping("/{id}")
-    public Result<String> delete(@PathVariable Long id) {
-        goodsService.deleteGoods(id);
-        return Result.success("ok");
-    }
-
     @Operation(summary = "Page goods")
     @GetMapping("/page")
     public Result<IPage<MarketGoods>> page(@RequestParam(defaultValue = "1") long current,
                                            @RequestParam(defaultValue = "10") long size,
                                            @RequestParam(required = false) String keyword,
-                                           @RequestParam(required = false) Long categoryId) {
-        return Result.success(goodsService.pageGoods(current, size, keyword, categoryId));
+                                           @RequestParam(required = false) Long categoryId,
+                                           @RequestParam(required = false) String conditionLevel,
+                                           @RequestParam(required = false) java.math.BigDecimal minPrice,
+                                           @RequestParam(required = false) java.math.BigDecimal maxPrice) {
+        return Result.success(goodsService.pageGoods(current, size, keyword, categoryId, conditionLevel, minPrice, maxPrice));
     }
 
     @Operation(summary = "Get goods detail")
     @GetMapping("/{id}")
     public Result<MarketGoods> get(@PathVariable Long id) {
-        return Result.success(goodsService.getGoods(id));
+        return Result.success(goodsService.getPublicGoods(id));
+    }
+
+    @Operation(summary = "List my goods")
+    @GetMapping("/my")
+    public Result<IPage<MarketGoods>> myGoods(@RequestParam(defaultValue = "1") long current,
+                                              @RequestParam(defaultValue = "10") long size,
+                                              @RequestParam(required = false) String status) {
+        return Result.success(goodsService.pageMyGoods(current, size, status));
+    }
+
+    @Operation(summary = "Submit goods audit")
+    @PutMapping("/{id}/submit")
+    public Result<MarketGoods> submit(@PathVariable Long id) {
+        return Result.success(goodsService.submitAudit(id));
+    }
+
+    @Operation(summary = "Off shelf my goods")
+    @PutMapping("/{id}/off")
+    public Result<MarketGoods> off(@PathVariable Long id) {
+        return Result.success(goodsService.offShelfMyGoods(id));
     }
 }

@@ -10,11 +10,11 @@ public interface OrderService extends IService<MarketOrder> {
 
     MarketOrder createOrder(OrderCreateRequest request);
 
-    List<MarketOrder> listMyOrders();
+    List<MarketOrder> listMyBuyOrders();
+
+    List<MarketOrder> listMySellOrders();
 
     MarketOrder getOrder(Long id);
-
-    MarketOrder payOrder(Long id);
 
     MarketOrder cancelOrder(Long id);
 

@@ -5,8 +5,6 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: campus_market
-      MYSQL_USER: campus_market
-      MYSQL_PASSWORD: campus_market
     ports:
       - "3307:3306"
     volumes:

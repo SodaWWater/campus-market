@@ -7,6 +7,7 @@ import com.liminghan.market.dto.CategoryRequest;
 import com.liminghan.market.entity.MarketCategory;
 import com.liminghan.market.mapper.MarketCategoryMapper;
 import com.liminghan.market.service.CategoryService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +21,9 @@ public class CategoryServiceImpl extends ServiceImpl<MarketCategoryMapper, Marke
     private static final String CATEGORY_CACHE_KEY = "market:category:list";
 
     private final RedisTemplate<String, Object> redisTemplate;
+
+    @Value("${app.cache.category-list-ttl-minutes:60}")
+    private long categoryListTtlMinutes;
 
     public CategoryServiceImpl(RedisTemplate<String, Object> redisTemplate) {
         this.redisTemplate = redisTemplate;
@@ -42,7 +46,7 @@ public class CategoryServiceImpl extends ServiceImpl<MarketCategoryMapper, Marke
                 .orderByAsc(MarketCategory::getSort)
                 .list();
         try {
-            redisTemplate.opsForValue().set(CATEGORY_CACHE_KEY, categories, Duration.ofHours(1));
+            redisTemplate.opsForValue().set(CATEGORY_CACHE_KEY, categories, Duration.ofMinutes(categoryListTtlMinutes));
         } catch (Exception ignored) {
             // Cache failure should not break category query.
         }

@@ -6,7 +6,10 @@ import com.liminghan.market.common.ErrorCode;
 import com.liminghan.market.dto.OrderCreateRequest;
 import com.liminghan.market.entity.MarketGoods;
 import com.liminghan.market.entity.MarketOrder;
+import com.liminghan.market.entity.OrderLog;
+import com.liminghan.market.mapper.MarketGoodsMapper;
 import com.liminghan.market.mapper.MarketOrderMapper;
+import com.liminghan.market.mapper.OrderLogMapper;
 import com.liminghan.market.security.SecurityContextUtil;
 import com.liminghan.market.service.GoodsService;
 import com.liminghan.market.service.OrderService;
@@ -21,9 +24,15 @@ import java.util.List;
 public class OrderServiceImpl extends ServiceImpl<MarketOrderMapper, MarketOrder> implements OrderService {
 
     private final GoodsService goodsService;
+    private final MarketGoodsMapper goodsMapper;
+    private final OrderLogMapper orderLogMapper;
 
-    public OrderServiceImpl(GoodsService goodsService) {
+    public OrderServiceImpl(GoodsService goodsService,
+                            MarketGoodsMapper goodsMapper,
+                            OrderLogMapper orderLogMapper) {
         this.goodsService = goodsService;
+        this.goodsMapper = goodsMapper;
+        this.orderLogMapper = orderLogMapper;
     }
 
     @Override
@@ -37,6 +46,10 @@ public class OrderServiceImpl extends ServiceImpl<MarketOrderMapper, MarketOrder
         if (goods.getSellerId().equals(buyerId)) {
             throw new BusinessException(ErrorCode.PARAM_ERROR, "cannot buy your own goods");
         }
+        int locked = goodsMapper.updateStatusIfMatch(goods.getId(), "ON_SALE", "LOCKED");
+        if (locked != 1) {
+            throw new BusinessException(ErrorCode.PARAM_ERROR, "goods has been locked or sold");
+        }
 
         MarketOrder order = new MarketOrder();
         order.setOrderNo(buildOrderNo());
@@ -48,18 +61,24 @@ public class OrderServiceImpl extends ServiceImpl<MarketOrderMapper, MarketOrder
         order.setCreatedAt(LocalDateTime.now());
         order.setUpdatedAt(LocalDateTime.now());
         save(order);
-
-        goods.setStatus("LOCKED");
-        goods.setUpdatedAt(LocalDateTime.now());
-        goodsService.updateById(goods);
+        saveOrderLog(order.getId(), buyerId, "CREATE", null, "CREATED", "create order and lock goods");
         return order;
     }
 
     @Override
-    public List<MarketOrder> listMyOrders() {
+    public List<MarketOrder> listMyBuyOrders() {
         Long userId = SecurityContextUtil.currentUser().getUserId();
         return lambdaQuery()
-                .and(query -> query.eq(MarketOrder::getBuyerId, userId).or().eq(MarketOrder::getSellerId, userId))
+                .eq(MarketOrder::getBuyerId, userId)
+                .orderByDesc(MarketOrder::getCreatedAt)
+                .list();
+    }
+
+    @Override
+    public List<MarketOrder> listMySellOrders() {
+        Long userId = SecurityContextUtil.currentUser().getUserId();
+        return lambdaQuery()
+                .eq(MarketOrder::getSellerId, userId)
                 .orderByDesc(MarketOrder::getCreatedAt)
                 .list();
     }
@@ -80,28 +99,6 @@ public class OrderServiceImpl extends ServiceImpl<MarketOrderMapper, MarketOrder
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public MarketOrder payOrder(Long id) {
-        MarketOrder order = getOrder(id);
-        Long userId = SecurityContextUtil.currentUser().getUserId();
-        if (!order.getBuyerId().equals(userId)) {
-            throw new BusinessException(ErrorCode.FORBIDDEN, "only buyer can pay order");
-        }
-        if (!"CREATED".equals(order.getStatus())) {
-            throw new BusinessException(ErrorCode.PARAM_ERROR, "only CREATED order can be paid");
-        }
-        order.setStatus("PAID");
-        order.setUpdatedAt(LocalDateTime.now());
-        updateById(order);
-
-        MarketGoods goods = goodsService.getGoods(order.getGoodsId());
-        goods.setStatus("SOLD");
-        goods.setUpdatedAt(LocalDateTime.now());
-        goodsService.updateById(goods);
-        return order;
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
     public MarketOrder cancelOrder(Long id) {
         MarketOrder order = getOrder(id);
         Long userId = SecurityContextUtil.currentUser().getUserId();
@@ -111,18 +108,17 @@ public class OrderServiceImpl extends ServiceImpl<MarketOrderMapper, MarketOrder
         if (!"CREATED".equals(order.getStatus())) {
             throw new BusinessException(ErrorCode.PARAM_ERROR, "only CREATED order can be canceled");
         }
+        String fromStatus = order.getStatus();
         order.setStatus("CANCELED");
         order.setUpdatedAt(LocalDateTime.now());
         updateById(order);
-
-        MarketGoods goods = goodsService.getGoods(order.getGoodsId());
-        goods.setStatus("ON_SALE");
-        goods.setUpdatedAt(LocalDateTime.now());
-        goodsService.updateById(goods);
+        goodsMapper.updateStatusIfMatch(order.getGoodsId(), "LOCKED", "ON_SALE");
+        saveOrderLog(order.getId(), userId, "CANCEL", fromStatus, "CANCELED", "cancel unpaid order and release goods");
         return order;
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public MarketOrder finishOrder(Long id) {
         MarketOrder order = getOrder(id);
         Long userId = SecurityContextUtil.currentUser().getUserId();
@@ -132,13 +128,32 @@ public class OrderServiceImpl extends ServiceImpl<MarketOrderMapper, MarketOrder
         if (!"PAID".equals(order.getStatus())) {
             throw new BusinessException(ErrorCode.PARAM_ERROR, "only PAID order can be finished");
         }
+        String fromStatus = order.getStatus();
         order.setStatus("FINISHED");
         order.setUpdatedAt(LocalDateTime.now());
         updateById(order);
+        saveOrderLog(order.getId(), userId, "FINISH", fromStatus, "FINISHED", "finish campus offline transaction");
         return order;
     }
 
     private String buildOrderNo() {
-        return "MO" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS"));
+        return "CM" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS"));
+    }
+
+    private void saveOrderLog(Long orderId,
+                              Long operatorId,
+                              String action,
+                              String fromStatus,
+                              String toStatus,
+                              String remark) {
+        OrderLog log = new OrderLog();
+        log.setOrderId(orderId);
+        log.setOperatorId(operatorId);
+        log.setAction(action);
+        log.setFromStatus(fromStatus);
+        log.setToStatus(toStatus);
+        log.setRemark(remark);
+        log.setCreatedAt(LocalDateTime.now());
+        orderLogMapper.insert(log);
     }
 }

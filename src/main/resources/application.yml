@@ -1,6 +1,5 @@
 server:
   port: 8082
-
 spring:
   application:
     name: campus-market-admin
@@ -12,7 +11,7 @@ spring:
   data:
     redis:
       host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
+      port: ${REDIS_PORT:6380}
       timeout: 2s
 
 mybatis-plus:
@@ -29,3 +28,11 @@ springdoc:
 jwt:
   secret: ${JWT_SECRET:campus-market-admin-dev-secret-change-me}
   expire-seconds: ${JWT_EXPIRE_SECONDS:86400}
+
+app:
+  cache:
+    category-list-ttl-minutes: 60
+    hot-goods-ttl-minutes: 10
+  upload:
+    base-dir: ${UPLOAD_BASE_DIR:uploads}
+    public-prefix: /uploads

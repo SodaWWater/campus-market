@@ -22,7 +22,21 @@ public class SysUser {
 
     private String phone;
 
+    private String avatarUrl;
+
+    private String school;
+
+    private String major;
+
+    private String grade;
+
+    private String bio;
+
+    private Integer creditScore;
+
     private String role;
+
+    private String status;
 
     private LocalDateTime createdAt;
 

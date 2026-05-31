@@ -21,6 +21,7 @@
         <java.version>17</java.version>
         <mybatis-plus.version>3.5.9</mybatis-plus.version>
         <springdoc.version>2.6.0</springdoc.version>
+        <lombok.version>1.18.38</lombok.version>
     </properties>
 
     <dependencies>

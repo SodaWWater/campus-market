@@ -14,12 +14,14 @@ public class SecurityUser implements UserDetails {
     private final String username;
     private final String password;
     private final String role;
+    private final String status;
 
     public SecurityUser(SysUser user) {
         this.userId = user.getId();
         this.username = user.getUsername();
         this.password = user.getPassword();
         this.role = user.getRole();
+        this.status = user.getStatus();
     }
 
     public SecurityUser(Long userId, String username, String role) {
@@ -27,6 +29,7 @@ public class SecurityUser implements UserDetails {
         this.username = username;
         this.password = "";
         this.role = role;
+        this.status = "ENABLE";
     }
 
     public Long getUserId() {
@@ -69,6 +72,6 @@ public class SecurityUser implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return "ENABLE".equals(status);
     }
 }

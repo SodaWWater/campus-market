@@ -14,5 +14,9 @@ public interface AdminService {
 
     MarketGoods offShelfGoods(Long id);
 
+    MarketGoods approveGoods(Long id);
+
+    MarketGoods rejectGoods(Long id, String reason);
+
     List<MarketOrder> listOrders();
 }

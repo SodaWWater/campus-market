@@ -13,12 +13,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Set;
-
 @Service
 public class AuthServiceImpl implements AuthService {
-
-    private static final Set<String> ROLES = Set.of("USER", "ADMIN");
 
     private final SysUserService sysUserService;
     private final PasswordEncoder passwordEncoder;
@@ -36,16 +32,14 @@ public class AuthServiceImpl implements AuthService {
         if (count > 0) {
             throw new BusinessException(ErrorCode.PARAM_ERROR, "username already exists");
         }
-        String role = request.getRole() == null || request.getRole().isBlank() ? "USER" : request.getRole().toUpperCase();
-        if (!ROLES.contains(role)) {
-            throw new BusinessException(ErrorCode.PARAM_ERROR, "role must be USER or ADMIN");
-        }
         SysUser user = new SysUser();
         user.setUsername(request.getUsername());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setNickname(request.getNickname());
         user.setPhone(request.getPhone());
-        user.setRole(role);
+        user.setCreditScore(100);
+        user.setRole("USER");
+        user.setStatus("ENABLE");
         user.setCreatedAt(LocalDateTime.now());
         user.setUpdatedAt(LocalDateTime.now());
         sysUserService.save(user);
@@ -57,6 +51,9 @@ public class AuthServiceImpl implements AuthService {
         SysUser user = sysUserService.lambdaQuery().eq(SysUser::getUsername, request.getUsername()).one();
         if (user == null || !passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new BusinessException(ErrorCode.UNAUTHORIZED, "username or password is incorrect");
+        }
+        if (!"ENABLE".equals(user.getStatus())) {
+            throw new BusinessException(ErrorCode.FORBIDDEN, "user is disabled");
         }
         return buildLoginResponse(user);
     }

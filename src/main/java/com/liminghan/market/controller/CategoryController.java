@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/category")
 public class CategoryController {
 
     private final CategoryService categoryService;
@@ -21,7 +20,7 @@ public class CategoryController {
     }
 
     @Operation(summary = "List categories")
-    @GetMapping("/list")
+    @GetMapping({"/api/categories", "/api/category/list"})
     public Result<List<MarketCategory>> list() {
         return Result.success(categoryService.listCategories());
     }

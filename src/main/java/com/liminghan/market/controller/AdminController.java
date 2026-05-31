@@ -2,6 +2,7 @@ package com.liminghan.market.controller;
 
 import com.liminghan.market.common.Result;
 import com.liminghan.market.dto.CategoryRequest;
+import com.liminghan.market.dto.RejectGoodsRequest;
 import com.liminghan.market.entity.MarketCategory;
 import com.liminghan.market.entity.MarketGoods;
 import com.liminghan.market.entity.MarketOrder;
@@ -51,6 +52,26 @@ public class AdminController {
         return Result.success(adminService.offShelfGoods(id));
     }
 
+    @Operation(summary = "List pending audit goods")
+    @GetMapping("/goods/pending")
+    public Result<List<MarketGoods>> pendingGoods() {
+        return Result.success(adminService.listGoods().stream()
+                .filter(goods -> "PENDING_AUDIT".equals(goods.getStatus()))
+                .toList());
+    }
+
+    @Operation(summary = "Approve goods")
+    @PutMapping("/goods/{id}/approve")
+    public Result<MarketGoods> approveGoods(@PathVariable Long id) {
+        return Result.success(adminService.approveGoods(id));
+    }
+
+    @Operation(summary = "Reject goods")
+    @PutMapping("/goods/{id}/reject")
+    public Result<MarketGoods> rejectGoods(@PathVariable Long id, @Valid @RequestBody RejectGoodsRequest request) {
+        return Result.success(adminService.rejectGoods(id, request.getReason()));
+    }
+
     @Operation(summary = "List all orders")
     @GetMapping("/orders")
     public Result<List<MarketOrder>> listOrders() {
@@ -58,19 +79,19 @@ public class AdminController {
     }
 
     @Operation(summary = "Create category")
-    @PostMapping("/category")
+    @PostMapping("/categories")
     public Result<MarketCategory> createCategory(@Valid @RequestBody CategoryRequest request) {
         return Result.success(categoryService.createCategory(request));
     }
 
     @Operation(summary = "Update category")
-    @PutMapping("/category/{id}")
+    @PutMapping("/categories/{id}")
     public Result<MarketCategory> updateCategory(@PathVariable Long id, @Valid @RequestBody CategoryRequest request) {
         return Result.success(categoryService.updateCategory(id, request));
     }
 
     @Operation(summary = "Delete category")
-    @DeleteMapping("/category/{id}")
+    @DeleteMapping("/categories/{id}")
     public Result<String> deleteCategory(@PathVariable Long id) {
         categoryService.deleteCategory(id);
         return Result.success("ok");

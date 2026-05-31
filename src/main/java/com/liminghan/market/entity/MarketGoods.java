@@ -25,9 +25,19 @@ public class MarketGoods {
 
     private BigDecimal price;
 
+    private String conditionLevel;
+
+    private String tradeLocation;
+
+    private String coverImage;
+
     private String status;
 
+    private String auditReason;
+
     private Integer viewCount;
+
+    private Integer favoriteCount;
 
     private LocalDateTime createdAt;
 

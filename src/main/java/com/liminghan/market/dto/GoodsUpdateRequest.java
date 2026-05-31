@@ -3,6 +3,7 @@ package com.liminghan.market.dto;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 public class GoodsUpdateRequest {
@@ -15,5 +16,9 @@ public class GoodsUpdateRequest {
 
     private BigDecimal price;
 
-    private String status;
+    private String conditionLevel;
+
+    private String tradeLocation;
+
+    private List<String> imageUrls;
 }
