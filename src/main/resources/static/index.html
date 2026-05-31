@@ -143,12 +143,16 @@
     return request('/api/payments/mock-pay', {method: 'POST', body: JSON.stringify({orderId: Number(orderId.value)})});
   }
 
-  function finishOrder() {
-    return request(`/api/orders/${orderId.value}/finish`, {method: 'PUT'});
+  async function finishOrder() {
+    const r = await request(`/api/orders/${orderId.value}/finish`, {method: 'PUT'});
+    if (r.code === 0) loadGoods();
+    return r;
   }
 
-  function cancelOrder() {
-    return request(`/api/orders/${orderId.value}/cancel`, {method: 'PUT'});
+  async function cancelOrder() {
+    const r = await request(`/api/orders/${orderId.value}/cancel`, {method: 'PUT'});
+    if (r.code === 0) loadGoods();
+    return r;
   }
 
   loadGoods();

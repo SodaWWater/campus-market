@@ -1,3 +1,5 @@
+SET NAMES utf8mb4;
+
 USE campus_market;
 
 -- Sample password is 123456, stored as BCrypt.

@@ -278,11 +278,12 @@ import {
   finishOrder,
   health,
   listCategories,
-  listMyOrders,
+  listMyBuyOrders,
+  listMySellOrders,
   login,
   offShelfGoods,
   pageGoods,
-  payOrder,
+  mockPay,
   register
 } from './api/market'
 
@@ -388,13 +389,17 @@ async function quickOrder(goodsId) {
 }
 
 async function loadOrders() {
-  orders.value = await listMyOrders()
+  const [buy, sell] = await Promise.allSettled([listMyBuyOrders(), listMySellOrders()])
+  orders.value = [
+    ...(buy.status === 'fulfilled' ? buy.value : []),
+    ...(sell.status === 'fulfilled' ? sell.value : [])
+  ]
 }
 
 async function pay(id) {
-  await payOrder(id)
+  await mockPay({ orderId: id })
   ElMessage.success('已支付')
-  await loadOrders()
+  await Promise.allSettled([loadOrders(), loadGoods()])
 }
 
 async function cancel(id) {
