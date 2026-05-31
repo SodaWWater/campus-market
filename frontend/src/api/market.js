@@ -28,6 +28,10 @@ export function pageGoods(params) {
   return http.get('/goods/page', { params })
 }
 
+export function pageMyGoods(params) {
+  return http.get('/goods/my', { params })
+}
+
 export function getGoods(id) {
   return http.get(`/goods/${id}`)
 }

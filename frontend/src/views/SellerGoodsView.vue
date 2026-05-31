@@ -77,7 +77,7 @@
 <script setup>
 import { onMounted, reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus'
-import { pageGoods, offShelfGoods as offShelfMyGoods, listCategories, createGoods } from '../api/market'
+import { pageMyGoods, offShelfGoods as offShelfMyGoods, listCategories, createGoods } from '../api/market'
 
 const list = ref([])
 const categories = ref([])
@@ -91,7 +91,7 @@ function statusTag(s) { return { ON_SALE: 'success', PENDING_AUDIT: 'warning', R
 function statusLabel(s) { return { ON_SALE: '在售', PENDING_AUDIT: '待审核', REJECTED: '已驳回', LOCKED: '已锁定', SOLD: '已售', OFF_SHELF: '已下架' }[s] || s }
 
 async function load() {
-  const r = await pageGoods({ current: 1, size: 100 })
+  const r = await pageMyGoods({ current: 1, size: 100 })
   list.value = r.records || []
 }
 async function offShelf(id) {
