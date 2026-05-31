@@ -43,7 +43,7 @@ async function submit() {
   try {
     auth.save(await register({ ...form }))
     ElMessage.success('注册成功')
-    router.push('/market')
+    router.push(auth.isAdmin ? '/admin/dashboard' : '/market')
   } finally { loading.value = false }
 }
 </script>

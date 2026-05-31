@@ -65,8 +65,8 @@ router.beforeEach((to, from, next) => {
   if (to.matched.some(r => r.meta.admin) && !auth.isAdmin) return next('/market')
   // Auth-required routes
   if (to.meta.auth && !auth.isLoggedIn) return next('/login')
-  // Guest-only routes
-  if (to.meta.guest && auth.isLoggedIn) return next('/market')
+  // Guest-only routes: logged-in users go to their home
+  if (to.meta.guest && auth.isLoggedIn) return next(auth.isAdmin ? '/admin/dashboard' : '/market')
   next()
 })
 

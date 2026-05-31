@@ -37,7 +37,7 @@ async function submit() {
   try {
     auth.save(await login({ ...form }))
     ElMessage.success('登录成功')
-    router.push('/market')
+    router.push(auth.isAdmin ? '/admin/dashboard' : '/market')
   } finally { loading.value = false }
 }
 </script>
