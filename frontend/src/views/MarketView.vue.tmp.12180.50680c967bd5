@@ -79,8 +79,8 @@ async function search() {
 }
 
 function reset() {
-  query.page = 1; query.keyword = ''; query.categoryId = undefined
-  query.conditionLevel = undefined; query.minPrice = undefined; query.maxPrice = undefined
+  query.page = 1; query.keyword = ''; query.categoryId = null
+  query.conditionLevel = null; query.minPrice = null; query.maxPrice = null
   search()
 }
 
