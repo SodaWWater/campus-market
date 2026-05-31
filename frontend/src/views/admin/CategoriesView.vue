@@ -1,27 +1,31 @@
 <template>
   <div>
-    <el-card header="分类管理">
+    <h3 style="margin:0 0 20px">分类管理</h3>
+    <el-card>
       <el-form :inline="true" style="margin-bottom:16px">
         <el-input v-model="form.name" placeholder="分类名称" style="width:160px" />
-        <el-input-number v-model="form.sort" :min="0" placeholder="排序" style="width:120px;margin-left:8px" />
-        <el-select v-model="form.status" style="width:120px;margin-left:8px">
+        <el-input-number v-model="form.sort" :min="0" placeholder="排序" style="width:100px;margin-left:8px" />
+        <el-select v-model="form.status" style="width:100px;margin-left:8px">
           <el-option label="启用" value="ENABLE" />
           <el-option label="禁用" value="DISABLED" />
         </el-select>
         <el-button type="primary" @click="create" style="margin-left:8px">新增</el-button>
       </el-form>
-      <el-table :data="list">
+      <el-table :data="list" v-if="list.length > 0">
         <el-table-column prop="id" label="ID" width="70" />
         <el-table-column prop="name" label="名称" />
         <el-table-column prop="sort" label="排序" width="80" />
-        <el-table-column prop="status" label="状态" width="100" />
+        <el-table-column prop="status" label="状态" width="100">
+          <template #default="{ row }"><el-tag :type="row.status === 'ENABLE' ? 'success' : 'info'">{{ row.status === 'ENABLE' ? '启用' : '禁用' }}</el-tag></template>
+        </el-table-column>
         <el-table-column label="操作" width="160">
           <template #default="{ row }">
-            <el-button size="small" v-if="row.status==='DISABLED'" @click="enable(row.id)">启用</el-button>
+            <el-button size="small" type="success" v-if="row.status==='DISABLED'" @click="enable(row.id)">启用</el-button>
             <el-button size="small" type="warning" v-if="row.status==='ENABLE'" @click="disable(row.id)">禁用</el-button>
           </template>
         </el-table-column>
       </el-table>
+      <el-empty v-else description="暂无分类" />
     </el-card>
   </div>
 </template>
@@ -44,6 +48,5 @@ async function create() {
 }
 async function enable(id) { await enableCategory(id); ElMessage.success('已启用'); await load() }
 async function disable(id) { await disableCategory(id); ElMessage.success('已禁用'); await load() }
-
 onMounted(load)
 </script>

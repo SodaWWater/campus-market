@@ -30,7 +30,7 @@
         <el-menu-item index="/admin/goods/pending">
           <el-icon><Clock /></el-icon>
           <span>商品审核</span>
-          <el-badge v-if="pendingCount > 0" :value="pendingCount" class="menu-badge" />
+          <span v-if="pendingCount > 0" class="pending-badge">{{ pendingCount }}</span>
         </el-menu-item>
         <el-menu-item index="/admin/orders">
           <el-icon><Tickets /></el-icon>
@@ -183,7 +183,18 @@ onMounted(async () => {
 }
 .admin-menu .el-menu-item:hover { background-color: #ffffff15 !important; }
 .admin-menu .el-menu-item.is-active { background-color: #409eff !important; }
-.menu-badge { margin-left: auto; }
+.pending-badge {
+  margin-left: auto;
+  background: #f56c6c;
+  color: #fff;
+  font-size: 11px;
+  min-width: 18px;
+  height: 18px;
+  line-height: 18px;
+  text-align: center;
+  border-radius: 9px;
+  padding: 0 5px;
+}
 .sidebar-footer {
   padding: 12px 16px;
   border-top: 1px solid #ffffff15;

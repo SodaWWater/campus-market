@@ -1,21 +1,25 @@
 <template>
   <div>
-    <el-card header="用户管理">
-      <el-table :data="list">
+    <h3 style="margin:0 0 20px">用户管理</h3>
+    <el-card>
+      <el-table :data="list" v-if="list.length > 0">
         <el-table-column prop="id" label="ID" width="70" />
         <el-table-column prop="username" label="用户名" />
         <el-table-column prop="nickname" label="昵称" />
-        <el-table-column prop="role" label="角色" width="90" />
+        <el-table-column prop="role" label="角色" width="90">
+          <template #default="{ row }"><el-tag :type="row.role === 'ADMIN' ? 'danger' : 'primary'" size="small">{{ row.role }}</el-tag></template>
+        </el-table-column>
         <el-table-column prop="status" label="状态" width="90">
-          <template #default="{ row }"><el-tag :type="row.status==='ENABLE'?'success':'danger'">{{ row.status }}</el-tag></template>
+          <template #default="{ row }"><el-tag :type="row.status === 'ENABLE' ? 'success' : 'danger'">{{ row.status === 'ENABLE' ? '启用' : '禁用' }}</el-tag></template>
         </el-table-column>
         <el-table-column label="操作" width="160">
           <template #default="{ row }">
-            <el-button size="small" v-if="row.status === 'ENABLE'" type="warning" @click="disable(row.id)">禁用</el-button>
-            <el-button size="small" v-if="row.status === 'DISABLED'" type="success" @click="enable(row.id)">启用</el-button>
+            <el-button size="small" type="warning" v-if="row.status === 'ENABLE' && row.role !== 'ADMIN'" @click="disable(row.id)">禁用</el-button>
+            <el-button size="small" type="success" v-if="row.status === 'DISABLED'" @click="enable(row.id)">启用</el-button>
           </template>
         </el-table-column>
       </el-table>
+      <el-empty v-else description="暂无用户数据" />
     </el-card>
   </div>
 </template>
