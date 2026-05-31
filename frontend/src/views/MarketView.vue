@@ -1,36 +1,54 @@
 <template>
   <div class="market-page">
     <el-card class="search-card">
-      <el-form :inline="true">
-        <el-form-item><el-input v-model="query.keyword" placeholder="搜索商品" clearable @keyup.enter="search" /></el-form-item>
+      <el-form :inline="true" class="search-form">
         <el-form-item>
-          <el-select v-model="query.categoryId" clearable placeholder="全部分类">
+          <el-input v-model="query.keyword" placeholder="搜索商品" clearable @keyup.enter="search" style="width:200px" />
+        </el-form-item>
+        <el-form-item>
+          <el-select v-model="query.categoryId" clearable placeholder="全部分类" style="width:140px">
             <el-option v-for="c in categories" :key="c.id" :label="c.name" :value="c.id" />
           </el-select>
         </el-form-item>
-        <el-form-item><el-button type="primary" @click="search">搜索</el-button></el-form-item>
+        <el-form-item>
+          <el-select v-model="query.conditionLevel" clearable placeholder="全部成色" style="width:130px">
+            <el-option label="全新" value="NEW" />
+            <el-option label="几乎全新" value="LIKE_NEW" />
+            <el-option label="良好" value="GOOD" />
+            <el-option label="一般" value="NORMAL" />
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-input-number v-model="query.minPrice" :min="0" placeholder="最低价" controls-position="right" style="width:130px" />
+        </el-form-item>
+        <el-form-item>
+          <el-input-number v-model="query.maxPrice" :min="0" placeholder="最高价" controls-position="right" style="width:130px" />
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="search">搜索</el-button>
+          <el-button @click="reset">重置</el-button>
+        </el-form-item>
       </el-form>
     </el-card>
 
     <div class="goods-grid" v-if="goods.length > 0">
       <el-card v-for="item in goods" :key="item.id" class="goods-card" shadow="hover" @click="$router.push(`/goods/${item.id}`)">
         <div class="goods-cover">{{ item.title.charAt(0) }}</div>
-        <h3>{{ item.title }}</h3>
+        <h3 :title="item.title">{{ item.title }}</h3>
         <div class="goods-price">¥{{ item.price }}</div>
         <div class="goods-meta">
-          <el-tag size="small">{{ conditionLabel(item.conditionLevel) }}</el-tag>
-          <span>{{ item.tradeLocation || '' }}</span>
+          <el-tag size="small" type="info">{{ conditionLabel(item.conditionLevel) }}</el-tag>
+          <span class="meta-location" :title="item.tradeLocation">{{ item.tradeLocation || '-' }}</span>
         </div>
         <div class="goods-stats">
           <span>❤ {{ item.favoriteCount || 0 }}</span>
           <span>👁 {{ item.viewCount || 0 }}</span>
-          <el-tag size="small" :type="item.status === 'ON_SALE' ? 'success' : 'info'">{{ item.status }}</el-tag>
         </div>
       </el-card>
     </div>
     <el-empty v-else description="暂无商品" />
 
-    <div class="pagination-wrap" v-if="total > 0">
+    <div class="pagination-wrap" v-if="total > 10">
       <el-pagination :total="total" :page-size="query.size" :current-page="query.page" layout="total, prev, pager, next" @current-change="page => { query.page = page; search() }" />
     </div>
   </div>
@@ -43,14 +61,27 @@ import { listCategories, pageGoods } from '../api/market'
 const categories = ref([])
 const goods = ref([])
 const total = ref(0)
-const query = reactive({ page: 1, size: 10, keyword: '', categoryId: null })
+const query = reactive({ page: 1, size: 12, keyword: '', categoryId: null, conditionLevel: null, minPrice: null, maxPrice: null })
 
 function conditionLabel(v) { return { NEW: '全新', LIKE_NEW: '几乎全新', GOOD: '良好', NORMAL: '一般' }[v] || v }
 
 async function search() {
-  const r = await pageGoods({ current: query.page, size: query.size, keyword: query.keyword || undefined, categoryId: query.categoryId || undefined })
+  const r = await pageGoods({
+    current: query.page, size: query.size,
+    keyword: query.keyword || undefined,
+    categoryId: query.categoryId || undefined,
+    conditionLevel: query.conditionLevel || undefined,
+    minPrice: query.minPrice || undefined,
+    maxPrice: query.maxPrice || undefined
+  })
   goods.value = r.records || []
   total.value = r.total || 0
+}
+
+function reset() {
+  query.page = 1; query.keyword = ''; query.categoryId = null
+  query.conditionLevel = null; query.minPrice = null; query.maxPrice = null
+  search()
 }
 
 onMounted(async () => {
@@ -61,13 +92,24 @@ onMounted(async () => {
 
 <style scoped>
 .search-card { margin-bottom: 20px; }
-.goods-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
-.goods-card { cursor: pointer; transition: transform .2s; }
-.goods-card:hover { transform: translateY(-2px); }
-.goods-cover { height: 120px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; font-size: 40px; color: #fff; font-weight: bold; border-radius: 6px; margin-bottom: 12px; }
-.goods-card h3 { margin: 0 0 8px; font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.goods-price { color: #f56c6c; font-size: 20px; font-weight: bold; margin-bottom: 8px; }
-.goods-meta { display: flex; gap: 8px; align-items: center; color: #909399; font-size: 12px; margin-bottom: 8px; }
-.goods-stats { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #909399; }
+.search-form .el-form-item { margin-bottom: 0; }
+.goods-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 16px; }
+.goods-card { cursor: pointer; transition: transform .2s,border-color .2s; }
+.goods-card:hover { transform: translateY(-2px); border-color: #409eff; }
+.goods-cover {
+  height: 130px; display: flex; align-items: center; justify-content: center;
+  font-size: 48px; color: #fff; font-weight: bold; border-radius: 8px;
+  margin-bottom: 14px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+.goods-card:nth-child(5n+2) .goods-cover { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+.goods-card:nth-child(5n+3) .goods-cover { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+.goods-card:nth-child(5n+4) .goods-cover { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+.goods-card:nth-child(5n+0) .goods-cover { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+.goods-card h3 { margin: 0 0 8px; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.goods-price { color: #f56c6c; font-size: 20px; font-weight: bold; margin-bottom: 10px; }
+.goods-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.meta-location { font-size: 12px; color: #909399; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+.goods-stats { display: flex; justify-content: space-between; font-size: 12px; color: #909399; padding-top: 10px; border-top: 1px solid #f0f0f0; }
 .pagination-wrap { margin-top: 24px; display: flex; justify-content: center; }
 </style>

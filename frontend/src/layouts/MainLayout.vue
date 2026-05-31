@@ -6,7 +6,6 @@
         <el-menu mode="horizontal" :default-active="activeRoute" router class="header-menu">
           <el-menu-item index="/market">商品广场</el-menu-item>
           <el-menu-item index="/seller/goods" v-if="auth.isLoggedIn">我的商品</el-menu-item>
-          <el-menu-item index="/seller/goods/new" v-if="auth.isLoggedIn">发布商品</el-menu-item>
           <el-menu-item index="/buyer/orders" v-if="auth.isLoggedIn">我买到的</el-menu-item>
           <el-menu-item index="/seller/orders" v-if="auth.isLoggedIn">我卖出的</el-menu-item>
           <el-menu-item index="/favorites" v-if="auth.isLoggedIn">收藏夹</el-menu-item>
@@ -70,7 +69,6 @@ const unreadCount = ref(0)
 
 const activeRoute = computed(() => {
   const path = route.path
-  if (path.startsWith('/seller/goods/new')) return '/seller/goods/new'
   if (path.startsWith('/seller/goods')) return '/seller/goods'
   if (path.startsWith('/buyer/orders')) return '/buyer/orders'
   if (path.startsWith('/seller/orders')) return '/seller/orders'

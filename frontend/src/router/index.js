@@ -25,7 +25,6 @@ const routes = [
       { path: 'market', name: 'Market', component: () => import('../views/MarketView.vue') },
       { path: 'goods/:id', name: 'GoodsDetail', component: () => import('../views/GoodsDetailView.vue') },
       { path: 'seller/goods', name: 'SellerGoods', component: () => import('../views/SellerGoodsView.vue'), meta: { auth: true } },
-      { path: 'seller/goods/new', name: 'PublishGoods', component: () => import('../views/PublishGoodsView.vue'), meta: { auth: true } },
       { path: 'buyer/orders', name: 'BuyerOrders', component: () => import('../views/BuyerOrdersView.vue'), meta: { auth: true } },
       { path: 'seller/orders', name: 'SellerOrders', component: () => import('../views/SellerOrdersView.vue'), meta: { auth: true } },
       { path: 'favorites', name: 'Favorites', component: () => import('../views/FavoritesView.vue'), meta: { auth: true } },
