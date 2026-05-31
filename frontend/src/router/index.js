@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import MainLayout from '../layouts/MainLayout.vue'
+import AdminLayout from '../layouts/AdminLayout.vue'
 
 const routes = [
   {
@@ -15,6 +16,7 @@ const routes = [
     component: () => import('../views/RegisterView.vue'),
     meta: { guest: true }
   },
+  // ---- User-facing routes with MainLayout ----
   {
     path: '/',
     component: MainLayout,
@@ -28,15 +30,24 @@ const routes = [
       { path: 'seller/orders', name: 'SellerOrders', component: () => import('../views/SellerOrdersView.vue'), meta: { auth: true } },
       { path: 'favorites', name: 'Favorites', component: () => import('../views/FavoritesView.vue'), meta: { auth: true } },
       { path: 'messages', name: 'Messages', component: () => import('../views/MessagesView.vue'), meta: { auth: true } },
-      { path: 'profile', name: 'Profile', component: () => import('../views/ProfileView.vue'), meta: { auth: true } },
-      { path: 'admin/dashboard', name: 'AdminDashboard', component: () => import('../views/admin/DashboardView.vue'), meta: { auth: true, admin: true } },
-      { path: 'admin/categories', name: 'AdminCategories', component: () => import('../views/admin/CategoriesView.vue'), meta: { auth: true, admin: true } },
-      { path: 'admin/goods', name: 'AdminGoods', component: () => import('../views/admin/GoodsView.vue'), meta: { auth: true, admin: true } },
-      { path: 'admin/goods/pending', name: 'AdminPendingGoods', component: () => import('../views/admin/PendingGoodsView.vue'), meta: { auth: true, admin: true } },
-      { path: 'admin/orders', name: 'AdminOrders', component: () => import('../views/admin/OrdersView.vue'), meta: { auth: true, admin: true } },
-      { path: 'admin/users', name: 'AdminUsers', component: () => import('../views/admin/UsersView.vue'), meta: { auth: true, admin: true } },
-      { path: 'admin/reports', name: 'AdminReports', component: () => import('../views/admin/ReportsView.vue'), meta: { auth: true, admin: true } },
-      { path: 'admin/logs', name: 'AdminLogs', component: () => import('../views/admin/LogsView.vue'), meta: { auth: true, admin: true } }
+      { path: 'profile', name: 'Profile', component: () => import('../views/ProfileView.vue'), meta: { auth: true } }
+    ]
+  },
+  // ---- Admin routes with AdminLayout ----
+  {
+    path: '/admin',
+    component: AdminLayout,
+    meta: { auth: true, admin: true },
+    children: [
+      { path: '', redirect: '/admin/dashboard' },
+      { path: 'dashboard', name: 'AdminDashboard', component: () => import('../views/admin/DashboardView.vue') },
+      { path: 'categories', name: 'AdminCategories', component: () => import('../views/admin/CategoriesView.vue') },
+      { path: 'goods', name: 'AdminGoods', component: () => import('../views/admin/GoodsView.vue') },
+      { path: 'goods/pending', name: 'AdminPendingGoods', component: () => import('../views/admin/PendingGoodsView.vue') },
+      { path: 'orders', name: 'AdminOrders', component: () => import('../views/admin/OrdersView.vue') },
+      { path: 'users', name: 'AdminUsers', component: () => import('../views/admin/UsersView.vue') },
+      { path: 'reports', name: 'AdminReports', component: () => import('../views/admin/ReportsView.vue') },
+      { path: 'logs', name: 'AdminLogs', component: () => import('../views/admin/LogsView.vue') }
     ]
   },
   { path: '/:pathMatch(.*)*', redirect: '/market' }
@@ -50,8 +61,11 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const auth = useAuthStore()
   auth.load()
+  // Admin routes: auth + role required (checked at parent level)
+  if (to.matched.some(r => r.meta.admin) && !auth.isAdmin) return next('/market')
+  // Auth-required routes
   if (to.meta.auth && !auth.isLoggedIn) return next('/login')
-  if (to.meta.admin && !auth.isAdmin) return next('/market')
+  // Guest-only routes
   if (to.meta.guest && auth.isLoggedIn) return next('/market')
   next()
 })
