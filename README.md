@@ -118,13 +118,10 @@ curl -X PUT http://localhost:8082/api/admin/goods/1/approve \
 └── docker-compose.yml   # MySQL + Redis
 ```
 
-## 面试准备
+## 设计文档
 
 - `docs/design/` — 完整设计文档（PRD、架构、状态机、API、数据库、安全、部署）
-- `docs/design/14-interview-guide.md` — 面试讲解指南
-- `docs/interview-qa.md` — 30 题面试问答（含代码定位）
-- `docs/resume-description.md` — 简历项目描述
 
 ## 参考与致谢
 
-参考常见校园二手交易和后台管理项目的公开思路，结合实习简历场景做二次开发。
+参考常见校园二手交易和后台管理项目的公开设计思路，围绕完整交易闭环进行独立实现。

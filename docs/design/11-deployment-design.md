@@ -54,7 +54,7 @@ docker compose up -d
 1. MySQL。
 2. Redis。
 
-不强制把后端和前端放入 Docker，便于 IDEA 调试和面试演示。
+不强制把后端和前端放入 Docker，便于 IDEA 调试和本地演示。
 
 ## MySQL 初始化
 
